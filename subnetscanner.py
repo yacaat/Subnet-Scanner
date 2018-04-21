@@ -5,6 +5,7 @@ from queue import Queue
 from threading import Thread
 import time
 import pyperclip
+import sys
 
 
 
@@ -67,6 +68,6 @@ def subnet_scanner(network):
     pyperclip.copy(s)
 
 start = time.time()
-subnet_scanner('10.50.0.0')
+subnet_scanner(sys.argv[1])
 # print(ping('10.80.0.2','STATUS'))
 print(time.time()-start)
