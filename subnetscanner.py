@@ -6,6 +6,8 @@ from threading import Thread
 import time
 import pyperclip
 import sys
+import sqlite3
+import os.path
 
 
 
@@ -67,7 +69,35 @@ def subnet_scanner(network):
     s = s + ']'
     pyperclip.copy(s)
 
+    if not os.path.isfile('switch.db'):
+        conn = sqlite3.connect('switch.db')
+        c = conn.cursor()
+        c.execute('CREATE TABLE sw_ah(ip TEXT)')
+        c.execute('INSERT INTO sw_ah VALUES ("INITIALIZATION")')
+        conn.commit()
+        conn.close()
+
+    conn = sqlite3.connect('switch.db')
+    c = conn.cursor()
+    c.execute('SELECT ip FROM sw_ah')
+    all_rows = c.fetchall()
+    ipDBList = []
+    for row in all_rows:
+        ipDBList.append(row[0])
+
+    for ip in ipUpList:
+        if not (ip in ipDBList):
+            c.execute('INSERT INTO sw_ah VALUES("{}")'.format(ip))
+    # c.execute('INSERT INTO sw_ah VALUES ("10.80.0.3")')
+    # c.execute('INSERT INTO sw_ah VALUES ("10.80.0.4")')
+    #
+    c.execute('SELECT ip FROM sw_ah')
+    all_rows = c.fetchall()
+    print(all_rows)
+
+    conn.commit()
+    conn.close()
+
 start = time.time()
 subnet_scanner(sys.argv[1])
-# print(ping('10.80.0.2','STATUS'))
 print(time.time()-start)
